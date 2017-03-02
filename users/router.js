@@ -10,27 +10,31 @@ const router = express.Router();
 router.use(jsonParser);
 
 
-const strategy = new BasicStrategy(
-  (username, password, cb) => {
-    User
-      .findOne({username})
-      .exec()
-      .then(user => {
-        if (!user) {
-          return cb(null, false, {
-            message: 'Incorrect username'
-          });
-        }
-        if (user.password !== password) {
-          return cb(null, false, 'Incorrect password');
-        }
-        return cb(null, user);
-      })
-      .catch(err => cb(err))
+// NB: at time of writing, passport uses callbacks, not promises
+const basicStrategy = new BasicStrategy((username, password, callback) => {
+  let user;
+  User
+    .findOne({username: username})
+    .exec()
+    .then(_user => {
+      user = _user;
+      if (!user) {
+        return callback(null, false, {message: 'Incorrect username'});
+      }
+      return user.validatePassword(password);
+    })
+    .then(isValid => {
+      if (!isValid) {
+        return callback(null, false, {message: 'Incorrect password'});
+      }
+      else {
+        return callback(null, user)
+      }
+    });
 });
 
-passport.use(strategy);
-
+passport.use(basicStrategy);
+router.use(passport.initialize());
 
 router.post('/', (req, res) => {
   if (!req.body) {
@@ -109,32 +113,7 @@ router.get('/', (req, res) => {
 });
 
 
-// NB: at time of writing, passport uses callbacks, not promises
-const basicStrategy = new BasicStrategy(function(username, password, callback) {
-  let user;
-  User
-    .findOne({username: username})
-    .exec()
-    .then(_user => {
-      user = _user;
-      if (!user) {
-        return callback(null, false, {message: 'Incorrect username'});
-      }
-      return user.validatePassword(password);
-    })
-    .then(isValid => {
-      if (!isValid) {
-        return callback(null, false, {message: 'Incorrect password'});
-      }
-      else {
-        return callback(null, user)
-      }
-    });
-});
 
-
-passport.use(basicStrategy);
-router.use(passport.initialize());
 
 router.get('/me',
   passport.authenticate('basic', {session: false}),
