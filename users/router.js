@@ -19,18 +19,19 @@ const basicStrategy = new BasicStrategy((username, password, callback) => {
     .then(_user => {
       user = _user;
       if (!user) {
-        return callback(null, false, {message: 'Incorrect username'});
+        return callback(null, false);
       }
       return user.validatePassword(password);
     })
     .then(isValid => {
       if (!isValid) {
-        return callback(null, false, {message: 'Incorrect password'});
+        return callback(null, false);
       }
       else {
         return callback(null, user)
       }
-    });
+    })
+    .catch(err => callback(err);
 });
 
 passport.use(basicStrategy);
