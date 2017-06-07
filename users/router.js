@@ -31,7 +31,7 @@ const basicStrategy = new BasicStrategy((username, password, callback) => {
         return callback(null, user)
       }
     })
-    .catch(err => callback(err);
+    .catch(err => callback(err));
 });
 
 passport.use(basicStrategy);
