@@ -28,7 +28,7 @@ const basicStrategy = new BasicStrategy((username, password, callback) => {
         return callback(null, false);
       }
       else {
-        return callback(null, user)
+        return callback(null, user);
       }
     })
     .catch(err => callback(err));
