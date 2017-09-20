@@ -16,7 +16,6 @@ const basicStrategy = new BasicStrategy((username, password, callback) => {
   let user;
   User
     .findOne({username: username})
-    .exec()
     .then(_user => {
       user = _user;
       if (!user) {
@@ -77,7 +76,6 @@ router.post('/', (req, res) => {
   return User
     .find({username})
     .count()
-    .exec()
     .then(count => {
       if (count > 0) {
         return res.status(422).json({message: 'username already taken'});
@@ -109,13 +107,9 @@ router.post('/', (req, res) => {
 router.get('/', (req, res) => {
   return User
     .find()
-    .exec()
     .then(users => res.json(users.map(user => user.apiRepr())))
     .catch(err => console.log(err) && res.status(500).json({message: 'Internal server error'}));
 });
-
-
-
 
 router.get('/me',
   passport.authenticate('basic', {session: false}),
