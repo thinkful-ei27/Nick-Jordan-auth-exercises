@@ -1,3 +1,4 @@
+'use strict';
 const {BasicStrategy} = require('passport-http');
 const express = require('express');
 const jsonParser = require('body-parser').json();
@@ -82,7 +83,7 @@ router.post('/', (req, res) => {
         return res.status(422).json({message: 'username already taken'});
       }
       // if no existing user, hash password
-      return User.hashPassword(password)
+      return User.hashPassword(password);
     })
     .then(hash => {
       return User
@@ -91,13 +92,13 @@ router.post('/', (req, res) => {
           password: hash,
           firstName: firstName,
           lastName: lastName
-        })
+        });
     })
     .then(user => {
       return res.status(201).json(user.apiRepr());
     })
     .catch(err => {
-      res.status(500).json({message: 'Internal server error'})
+      res.status(500).json({message: 'Internal server error'});
     });
 });
 
