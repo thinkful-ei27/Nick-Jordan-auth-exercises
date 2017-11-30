@@ -1,12 +1,11 @@
 'use strict';
 
 const express = require('express');
-const mongoose = require('mongoose');
 const morgan = require('morgan');
+const mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
 
 const {router: usersRouter} = require('./users');
-
-mongoose.Promise = global.Promise;
 
 const {PORT, DATABASE_URL} = require('./config');
 
@@ -15,7 +14,7 @@ const app = express();
 // logging
 app.use(morgan('common'));
 
-app.use('/users/', usersRouter);
+app.use('/api', usersRouter);
 
 app.use('*', function(req, res) {
   return res.status(404).json({message: 'Not Found'});
