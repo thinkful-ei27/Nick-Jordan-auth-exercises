@@ -17,16 +17,16 @@ const localStrategy = new LocalStrategy((username, password, done) => {
   User
     .findOne({ username })
     .then(results => {
-      user = results;    
-      
+      user = results;
+
       if (!user) {
         return Promise.reject({
           reason: 'LoginError',
           message: 'Incorrect username',
           location: 'username'
         });
-      }    
-    
+      }
+
       return user.validatePassword(password);
     })
     .then(isValid => {
@@ -37,7 +37,7 @@ const localStrategy = new LocalStrategy((username, password, done) => {
           location: 'password'
         });
       }
-      return done(null, user);    
+      return done(null, user);
     })
     .catch(err => {
       if (err.reason === 'LoginError') {
@@ -165,7 +165,7 @@ router.post('/users', (req, res) => {
       });
     })
     .then(user => {
-      return res.status(201).location(`/api/users/${user.id}`).json(user.apiRepr());
+      return res.status(201).location(`/api/users/${user.id}`).json(user.serialize());
     })
     .catch(err => {
       // Forward validation errors on to the client, otherwise give a 500
@@ -179,7 +179,7 @@ router.post('/users', (req, res) => {
 
 router.get('/users/:id', (req, res) => {
   return User.findById(req.params.id)
-    .then(user => res.json(user.apiRepr()))
+    .then(user => res.json(user.serialize()))
     .catch(err => res.status(500).json({message: 'Internal server error'}));
 });
 
@@ -189,6 +189,6 @@ const localAuth = passport.authenticate('local', { session: false });
 router.post('/login', localAuth, function (req, res) {
   console.log(`${req.user.username} successfully logged in.`);
   return res.json({ data: 'rosebud' });
-}); 
+});
 
 module.exports = { router };
